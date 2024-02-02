@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poetry Search</title>
+</head>
+<body>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    .wrapper {
+      border: 2px solid #f76707;
+      border-radius: 5px;
+      background-color: #fff4e6;
+    }
+    
+    .wrapper > div {
+      border: 2px solid #ffa94d;
+      border-radius: 5px;
+      background-color: #ffd8a8;
+      padding: 1em;
+      color: #d9480f;
+    }
+    
+    .wrapper {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+  </style>
+  <div>
+    <label for="author">Search by Author:</label>
+    <input type="text" placeholder = "author" id="author" name="author">
+    <button onclick="searchByAuthor()">Search</button>
+  </div>
+
+  <div>
+    <label for="titleAuthor">Search by Title and Author:</label>
+    <input type="text" placeholder = "author" id="authorComb" name="authorComb">
+    <input type="text" placeholder = "title" id="titleComb" name="titleComb">
+    <button onclick="searchByTitleAuthor()">Search</button>
+  </div>
+  <div class="wrapper">
+    <p> Author : <br><span id="authorResult"></p> 
+    <p> Titles : <br><span id="titleResult"></p> 
+    <p> Poem : <br><span id = "linesResult"></p>
+  </div>
+
+  
+
+
+  <script>
+    async function searchByAuthor() {
+      const apiUrl = 'https://poetrydb.org/author'
+      
+      // Clear previous results
+      document.getElementById('authorResult').innerHTML = '';
+      document.getElementById('titleResult').innerHTML = '';
+      document.getElementById('linesResult').innerHTML = '';
+      
+      //user input for url for author
+      const inputAuthor = document.getElementById('author').value;
+      const response = await fetch (`${apiUrl}/${inputAuthor}`);
+      const data = await response.json(); 
+
+      console.log(response)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      //extract titles and authors
+      const uniqueAuthors = [...new Set(data.map(item => item.author))];
+      titles = data.map(item => item.title);
+
+      // Get the results element
+      const resultsAuthor = document.getElementById('authorResult');
+      const resultsTitle = document.getElementById('titleResult');
+
+      // Set the HTML content with line breaks
+      resultsAuthor.innerHTML = uniqueAuthors.join('<br>');
+      resultsTitle.innerHTML = titles.join('<br>');
+
+
+    }
+
+    async function searchByTitleAuthor() {
+      const apiUrl = 'https://poetrydb.org/author,title'
+
+      // Clear previous results
+      document.getElementById('authorResult').innerHTML = '';
+      document.getElementById('titleResult').innerHTML = '';
+      document.getElementById('linesResult').innerHTML = '';
+
+      //user input for url for title and author
+      const inputAuthor = document.getElementById('authorComb').value;
+      const inputTitle = document.getElementById('titleComb').value;
+      const response = await fetch (`${apiUrl}/${inputAuthor};${inputTitle}`);
+      const data = await response.json();
+      console.log(response)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      //const { title, author, lines } = data;
+      //extract author
+      const uniqueAuthors = [...new Set(data.map(item => item.author))];
+
+      //extract titles
+      title = data.map(item => item.title);
+
+      //extract lines
+      lines = data.map(item => item.lines);
+
+      // Get the results element
+      const resultsAuthor = document.getElementById('authorResult');
+      const resultsTitle = document.getElementById('titleResult');
+      const resultsLines = document.getElementById('linesResult');
+
+      // Set the HTML content with line breaks
+      resultsAuthor.innerHTML = uniqueAuthors.join('<br>');
+      resultsTitle.innerHTML = title.join('<br>');
+      resultsLines.innerHTML = lines.join('<br>');
+
+    }
+  </script>
+</body>
+</html>
